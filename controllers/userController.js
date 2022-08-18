@@ -63,33 +63,20 @@ module.exports = {
       .catch((err) => res.status(500).json(err));
   },
   deleteUser(req, res) {
-    User.findOneAndDelete({ _id: req.params.userId })
-      .then((user) =>
-        !user
-          ? res.status(404).json({ message: "No such user exists" })
-          : Thought.deleteMany({ _id: { $in: user.thoughts } });
-          res.json( { message: "Succesfully deleted"})
-  
-      .catch((err) => {
-        console.log(err);
-        res.status(500).json(err);
-      });
+    User.findOneAndDelete(
+      { _id: req.params.userId }
+    )
+    .then(async(user) => {
+      !user
+        ? res.status(404).json({ message: 'No user with that ID found' })
+        : Thought.deleteMany({ _id: { $in: user.thoughts} });
+        res.json( { message: 'Successfully deleted', user } );
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).json(err);
+    });
   },
-//   deleteUser(req, res) {
-//     User.findOneAndDelete(
-//       { _id: req.params.userId }
-//     )
-//     .then(async(user) => {
-//       !user
-//         ? res.status(404).json({ message: 'No user with that ID found' })
-//         : Thought.deleteMany({ _id: { $in: user.thoughts} });
-//         res.json( { message: 'Successfully deleted', user } );
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//       return res.status(500).json(err);
-//     });
-//   },
   addFriend(req, res) {
     console.log("You are adding a friend");
     console.log(req.body);
