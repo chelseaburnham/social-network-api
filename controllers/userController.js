@@ -8,9 +8,7 @@ const headCount = async () =>
         count: { $sum: 1 },
       },
     },
-  ])
-    .then((numberOfUsers) => numberOfUsers);
-
+  ]).then((numberOfUsers) => numberOfUsers);
 
 module.exports = {
   getUsers(req, res) {
@@ -29,8 +27,8 @@ module.exports = {
   },
   getSingleUser(req, res) {
     User.findOne({ _id: req.params.userId })
-    .populate("friends")
-    .populate("thoughts")
+      .populate("friends")
+      .populate("thoughts")
       .select("-__v")
       .then(async (user) =>
         !user
@@ -57,39 +55,35 @@ module.exports = {
     )
       .then((user) =>
         !user
-          ? res.status(404).json({ message: 'No user with this id!' })
+          ? res.status(404).json({ message: "No user with this id!" })
           : res.json(user)
       )
       .catch((err) => res.status(500).json(err));
   },
   deleteUser(req, res) {
-    User.findOneAndDelete(
-      { _id: req.params.userId }
-    )
-    .then(async(user) => {
-      !user
-        ? res.status(404).json({ message: 'No user with that ID found' })
-        : Thought.deleteMany({ _id: { $in: user.thoughts} });
-        res.json( { message: 'Successfully deleted', user } );
-    })
-    .catch((err) => {
-      console.log(err);
-      return res.status(500).json(err);
-    });
+    User.findOneAndDelete({ _id: req.params.userId })
+      .then(async (user) => {
+        !user
+          ? res.status(404).json({ message: "No user with that ID found" })
+          : Thought.deleteMany({ _id: { $in: user.thoughts } });
+        res.json({ message: "Successfully deleted", user });
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(500).json(err);
+      });
   },
   addFriend(req, res) {
     console.log("You are adding a friend");
     console.log(req.body);
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $addToSet: { users: req.body } },//req.params.friendId
+      { $addToSet: { users: req.body } }, //req.params.friendId
       { runValidators: true, new: true }
     )
       .then((user) =>
         !user
-          ? res
-              .status(404)
-              .json({ message: "No user found with that ID :(" })
+          ? res.status(404).json({ message: "No user found with that ID :(" })
           : res.json(user)
       )
       .catch((err) => res.status(500).json(err));
@@ -97,14 +91,12 @@ module.exports = {
   removeFriend(req, res) {
     User.findOneAndUpdate(
       { _id: req.params.userId },
-      { $pull: { friends: req.params.friendId  } },
+      { $pull: { friends: req.params.friendId } },
       { runValidators: true, new: true }
     )
       .then((user) =>
         !user
-          ? res
-              .status(404)
-              .json({ message: "No user found with that ID :(" })
+          ? res.status(404).json({ message: "No user found with that ID :(" })
           : res.json(user)
       )
       .catch((err) => res.status(500).json(err));
